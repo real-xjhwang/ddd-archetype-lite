@@ -1,0 +1,5 @@
+spring:
+  config:
+    name: ddd-archetype-lite-app
+  profiles:
+    active: dev
