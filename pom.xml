@@ -12,6 +12,7 @@
     <description>单体的DDD项目脚手架</description>
     <modules>
         <module>ddd-archetype-lite-app</module>
+        <module>ddd-archetype-lite-trigger</module>
     </modules>
 
     <parent>
@@ -70,6 +71,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-archetype-plugin</artifactId>
                 <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>create-from-project</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
