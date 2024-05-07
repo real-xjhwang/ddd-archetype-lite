@@ -14,6 +14,7 @@
         <module>ddd-archetype-lite-app</module>
         <module>ddd-archetype-lite-trigger</module>
         <module>ddd-archetype-lite-domain</module>
+        <module>ddd-archetype-lite-infrastructure</module>
     </modules>
 
     <parent>
