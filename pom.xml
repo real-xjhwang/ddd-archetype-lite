@@ -16,6 +16,7 @@
         <module>ddd-archetype-lite-domain</module>
         <module>ddd-archetype-lite-infrastructure</module>
         <module>ddd-archetype-lite-types</module>
+        <module>ddd-archetype-lite-api</module>
     </modules>
 
     <parent>
@@ -31,8 +32,43 @@
         <spring-boot.version>2.7.6</spring-boot.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>2.0.40</version>
+        </dependency>
+
+        <!-- 没有引入spring-boot-starter-web的包没有logback-classic，不能打印日志。版本与当前spring-boot-starter引入的一致 -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+    </dependencies>
+
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <!-- springboot默认使用rabbitmq进行amqp的实现，这里引入amqp就引入了rabbitmq -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>3.23.4</version>
+            </dependency>
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
@@ -42,12 +78,6 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>8.0.33</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>2.0.40</version>
             </dependency>
             <dependency>
                 <groupId>cn.hutool</groupId>

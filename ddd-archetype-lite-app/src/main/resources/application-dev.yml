@@ -1,0 +1,62 @@
+# spring服务配置
+server:
+  port: 8000
+  tomcat:
+    threads:
+      # 设定处理客户请求的线程的最大数目，决定了服务器可以同时响应客户请求的数，默认200
+      max: 200
+      # 初始化线程数，最小空闲线程数，默认是10
+      min-spare: 50
+    # 等待队列长度
+    accept-count: 10
+
+# 日志
+logging:
+  level:
+    root: debug
+  config: classpath:logback-spring.xml
+
+# mybatis配置
+mybatis:
+  config-location: classpath:/mybatis/config/mybatis-config.xml
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+
+# spring-rabbitmq
+spring:
+  rabbitmq:
+    addresses:
+    port:
+    username:
+    password:
+    virtual-host:
+    listener:
+      simple:
+        # 每次投递1个消息，投递完成后再投递下1个消息
+        prefetch: 1
+    topic:
+      xxx: xxx
+
+# application自定义配置
+application:
+  thread:
+    pool:
+      core-pool-size: 20
+      maximum-pool-size: 50
+      keep-alive-time: 10
+      blocking-queue-capacity: 5000
+      rejected-execution-handler: CallerRunsPolicy
+  redis:
+    host:
+    port:
+    password:
+    retry-attempts: 3
+    retry-interval: 1000
+    keep-alive: true
+    connection-pool-size: 64
+    connection-minimum-idle-size: 10
+    idle-connection-timeout: 10000
+    connection-timeout: 10000
+    ping-connection-interval: 0
+    database: 0
+  web:
+    cross-origin: '*'

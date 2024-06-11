@@ -6,22 +6,18 @@
         <artifactId>ddd-archetype-lite</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>ddd-archetype-lite-domain</artifactId>
+    <artifactId>ddd-archetype-lite-api</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>com.xjhwang</groupId>
             <artifactId>ddd-archetype-lite-types</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
     <build>
-        <finalName>ddd-archetype-lite-domain</finalName>
+        <finalName>ddd-archetype-lite-api</finalName>
     </build>
 </project>

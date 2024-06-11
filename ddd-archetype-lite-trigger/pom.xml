@@ -14,6 +14,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.xjhwang</groupId>
@@ -23,6 +27,11 @@
         <dependency>
             <groupId>com.xjhwang</groupId>
             <artifactId>ddd-archetype-lite-types</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xjhwang</groupId>
+            <artifactId>ddd-archetype-lite-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
