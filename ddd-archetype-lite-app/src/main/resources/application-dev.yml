@@ -60,3 +60,6 @@ application:
     database: 0
   web:
     cross-origin: '*'
+  jwt:
+    sign-key: 214d47d1b4c84b0c9a5061fb769425d6
+    issuer: a3a2746ad5f0463f8622174646c4122f
