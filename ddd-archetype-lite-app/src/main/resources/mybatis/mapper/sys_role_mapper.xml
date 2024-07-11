@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjhwang.infrastructure.persistent.dao.SysRoleDao">
+
+    <resultMap id="defaultResultMap" type="com.xjhwang.infrastructure.persistent.po.SysRole">
+        <id property="id" column="id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="deleted" column="is_deleted"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <insert id="insert">
+        INSERT INTO `sys_role` (`id`, `name`, `create_time`, `update_time`, `create_by`, `update_by`, `is_deleted`)
+        VALUES (#{sysRole.id}, #{sysRole.name}, NOW(), NOW(), '', '', FALSE);
+    </insert>
+
+    <delete id="deleteById">
+        UPDATE `sys_role` SET `is_deleted` = TRUE WHERE `id` = #{id}
+    </delete>
+</mapper>

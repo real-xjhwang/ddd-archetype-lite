@@ -1,6 +1,6 @@
 package com.xjhwang.config;
 
-import com.xjhwang.util.ReflectUtils;
+import com.xjhwang.types.util.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
