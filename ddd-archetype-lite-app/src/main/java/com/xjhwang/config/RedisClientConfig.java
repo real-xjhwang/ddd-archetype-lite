@@ -40,6 +40,6 @@ public class RedisClientConfig {
             .setRetryInterval(properties.getRetryInterval())
             .setKeepAlive(properties.isKeepAlive())
             .setDatabase(properties.getDatabase());
-        return Redisson.create();
+        return Redisson.create(config);
     }
 }

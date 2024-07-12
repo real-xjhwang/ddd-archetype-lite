@@ -14,6 +14,7 @@ import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -75,6 +76,7 @@ public class GatewayConfig {
      * @return 代理配置
      */
     @Bean("defaultAdvisorAutoProxyCreator")
+    @ConditionalOnMissingBean(DefaultAdvisorAutoProxyCreator.class)
     public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
         
         DefaultAdvisorAutoProxyCreator defaultAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();

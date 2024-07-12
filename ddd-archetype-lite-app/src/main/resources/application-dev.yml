@@ -9,6 +9,8 @@ server:
       min-spare: 50
     # 等待队列长度
     accept-count: 10
+  servlet:
+    context-path: /api
 
 # 日志
 logging:
@@ -23,6 +25,11 @@ mybatis:
 
 # spring-rabbitmq
 spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    url: jdbc:mysql://127.0.0.1:3306/xxx?useUnicode=true&&characterEncoding=UTF8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=Asia/Shanghai
   rabbitmq:
     addresses:
     port:
