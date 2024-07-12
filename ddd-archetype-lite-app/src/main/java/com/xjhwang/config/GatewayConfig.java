@@ -44,10 +44,10 @@ public class GatewayConfig {
     }
     
     @Bean("defaultWebSecurityManager")
-    public DefaultWebSecurityManager defaultWebSecurityManager() {
+    public DefaultWebSecurityManager defaultWebSecurityManager(@Qualifier("gatewayAuthorizingRealm") GatewayAuthorizingRealm gatewayAuthorizingRealm) {
         
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
-        defaultWebSecurityManager.setRealm(gatewayAuthorizingRealm());
+        defaultWebSecurityManager.setRealm(gatewayAuthorizingRealm);
         // 关闭ShiroDao
         DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         DefaultSessionStorageEvaluator defaultSessionStorageEvaluator = new DefaultSessionStorageEvaluator();
@@ -84,7 +84,8 @@ public class GatewayConfig {
         return defaultAutoProxyCreator;
     }
     
-    private GatewayAuthorizingRealm gatewayAuthorizingRealm() {
+    @Bean("gatewayAuthorizingRealm")
+    public GatewayAuthorizingRealm gatewayAuthorizingRealm() {
         
         GatewayAuthorizingRealm gatewayAuthorizingRealm = new GatewayAuthorizingRealm();
         gatewayAuthorizingRealm.setCredentialsMatcher(hashedCredentialsMatcher());
