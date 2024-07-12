@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "application.thread.pool", ignoreInvalidFields = true)
 public class ApplicationThreadPoolConfigProperties {
     
-    private final String defaultRejectedExecutionHandlerClass = "java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy";
+    private final String defaultRejectedExecutionHandlerClass = "java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy";
     
     /**
      * 核心线程数：默认为20
