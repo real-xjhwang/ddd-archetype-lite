@@ -30,16 +30,18 @@ import java.util.Map;
 public class GatewayConfig {
     
     @Bean("shiroFilterFactoryBean")
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("defaultWebSecurityManager") SecurityManager securityManager) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("defaultWebSecurityManager") SecurityManager securityManager,
+        @Qualifier("defaultShiroFilterChainDefinition") DefaultShiroFilterChainDefinition defaultShiroFilterChainDefinition) {
         
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         
         Map<String, Filter> filters = MapUtils.builder(new HashMap<String, Filter>())
             .put("anon", new AnonymousFilter())
-            .put("jwt", new JwtFilter())
+            .put("authc", new JwtFilter())
             .build();
         shiroFilterFactoryBean.setFilters(filters);
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(defaultShiroFilterChainDefinition.getFilterChainMap());
         return shiroFilterFactoryBean;
     }
     
@@ -62,11 +64,11 @@ public class GatewayConfig {
         
         DefaultShiroFilterChainDefinition defaultShiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 登录接口不需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/api/v1/sign-in", "anon");
+        defaultShiroFilterChainDefinition.addPathDefinition("/api/v1/auth/sign-in", "anon");
         // 注册接口不需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/api/v1/sign-up", "anon");
+        defaultShiroFilterChainDefinition.addPathDefinition("/api/v1/auth/sign-up", "anon");
         // 其余接口都需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/**", "jwt");
+        defaultShiroFilterChainDefinition.addPathDefinition("/api/**", "authc");
         return defaultShiroFilterChainDefinition;
     }
     
@@ -85,14 +87,15 @@ public class GatewayConfig {
     }
     
     @Bean("gatewayAuthorizingRealm")
-    public GatewayAuthorizingRealm gatewayAuthorizingRealm() {
+    public GatewayAuthorizingRealm gatewayAuthorizingRealm(@Qualifier("hashedCredentialsMatcher") HashedCredentialsMatcher hashedCredentialsMatcher) {
         
         GatewayAuthorizingRealm gatewayAuthorizingRealm = new GatewayAuthorizingRealm();
-        gatewayAuthorizingRealm.setCredentialsMatcher(hashedCredentialsMatcher());
+        gatewayAuthorizingRealm.setCredentialsMatcher(hashedCredentialsMatcher);
         return gatewayAuthorizingRealm;
     }
     
-    private HashedCredentialsMatcher hashedCredentialsMatcher() {
+    @Bean("hashedCredentialsMatcher")
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
         
         HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
         hashedCredentialsMatcher.setHashAlgorithmName("SHA-256");
