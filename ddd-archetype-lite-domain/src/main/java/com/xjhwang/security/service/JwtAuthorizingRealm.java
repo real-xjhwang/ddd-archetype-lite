@@ -1,7 +1,6 @@
-package com.xjhwang.security.service.realm;
+package com.xjhwang.security.service;
 
-import com.xjhwang.security.model.entity.GatewayAuthenticationToken;
-import com.xjhwang.security.service.JwtProvider;
+import com.xjhwang.security.model.entity.JwtAuthenticationToken;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -15,9 +14,11 @@ import javax.annotation.Resource;
 import java.util.Date;
 
 /**
+ * 携带Token时校验
+ *
  * @author 黄雪杰 on 2024-07-11 15:55
  */
-public class GatewayAuthorizingRealm extends AuthorizingRealm {
+public class JwtAuthorizingRealm extends AuthorizingRealm {
     
     @Resource
     private JwtProvider jwtProvider;
@@ -25,7 +26,7 @@ public class GatewayAuthorizingRealm extends AuthorizingRealm {
     @Override
     public Class<?> getAuthenticationTokenClass() {
         
-        return GatewayAuthenticationToken.class;
+        return JwtAuthenticationToken.class;
     }
     
     @Override

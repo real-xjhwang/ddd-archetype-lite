@@ -1,10 +1,10 @@
 package com.xjhwang.config;
 
-import com.xjhwang.security.service.filter.JwtFilter;
-import com.xjhwang.security.service.realm.GatewayAuthorizingRealm;
+import com.xjhwang.security.service.JwtCredentialsMatcher;
+import com.xjhwang.security.service.JwtFilter;
+import com.xjhwang.security.service.JwtAuthorizingRealm;
 import com.xjhwang.types.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
@@ -12,9 +12,7 @@ import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,10 +33,12 @@ public class GatewayConfig {
         
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
+        shiroFilterFactoryBean.setLoginUrl("/v1/sign-in");
+        shiroFilterFactoryBean.setUnauthorizedUrl("/v1/error/unauthorized");
         
         Map<String, Filter> filters = MapUtils.builder(new HashMap<String, Filter>())
             .put("anon", new AnonymousFilter())
-            .put("authc", new JwtFilter())
+            .put("jwt", new JwtFilter())
             .build();
         shiroFilterFactoryBean.setFilters(filters);
         shiroFilterFactoryBean.setFilterChainDefinitionMap(defaultShiroFilterChainDefinition.getFilterChainMap());
@@ -46,15 +46,16 @@ public class GatewayConfig {
     }
     
     @Bean("defaultWebSecurityManager")
-    public DefaultWebSecurityManager defaultWebSecurityManager(@Qualifier("gatewayAuthorizingRealm") GatewayAuthorizingRealm gatewayAuthorizingRealm) {
+    public DefaultWebSecurityManager defaultWebSecurityManager(@Qualifier("gatewayAuthorizingRealm") JwtAuthorizingRealm jwtAuthorizingRealm) {
         
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
-        defaultWebSecurityManager.setRealm(gatewayAuthorizingRealm);
+        defaultWebSecurityManager.setRealm(jwtAuthorizingRealm);
         // 关闭ShiroDao
         DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         DefaultSessionStorageEvaluator defaultSessionStorageEvaluator = new DefaultSessionStorageEvaluator();
         // 不需要将Shiro Session中的东西存到任何地方
         defaultSessionStorageEvaluator.setSessionStorageEnabled(false);
+        subjectDAO.setSessionStorageEvaluator(defaultSessionStorageEvaluator);
         defaultWebSecurityManager.setSubjectDAO(subjectDAO);
         return defaultWebSecurityManager;
     }
@@ -64,42 +65,27 @@ public class GatewayConfig {
         
         DefaultShiroFilterChainDefinition defaultShiroFilterChainDefinition = new DefaultShiroFilterChainDefinition();
         // 登录接口不需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/api/v1/auth/sign-in", "anon");
+        defaultShiroFilterChainDefinition.addPathDefinition("/v1/auth/sign-in", "anon");
         // 注册接口不需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/api/v1/auth/sign-up", "anon");
+        defaultShiroFilterChainDefinition.addPathDefinition("/v1/auth/sign-up", "anon");
+        // 异常分发接口不需要认证
+        defaultShiroFilterChainDefinition.addPathDefinition("/v1/error/**", "anon");
         // 其余接口都需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/api/**", "authc");
+        defaultShiroFilterChainDefinition.addPathDefinition("/**", "jwt");
         return defaultShiroFilterChainDefinition;
     }
     
-    /**
-     * Shiro与Spring AOP整合时需要特殊配置，否则接口上的Shiro注解不生效
-     *
-     * @return 代理配置
-     */
-    @Bean("defaultAdvisorAutoProxyCreator")
-    @ConditionalOnMissingBean(DefaultAdvisorAutoProxyCreator.class)
-    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
-        
-        DefaultAdvisorAutoProxyCreator defaultAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
-        defaultAutoProxyCreator.setProxyTargetClass(true);
-        return defaultAutoProxyCreator;
-    }
-    
     @Bean("gatewayAuthorizingRealm")
-    public GatewayAuthorizingRealm gatewayAuthorizingRealm(@Qualifier("hashedCredentialsMatcher") HashedCredentialsMatcher hashedCredentialsMatcher) {
+    public JwtAuthorizingRealm gatewayAuthorizingRealm(@Qualifier("jwtCredentialsMatcher") JwtCredentialsMatcher jwtCredentialsMatcher) {
         
-        GatewayAuthorizingRealm gatewayAuthorizingRealm = new GatewayAuthorizingRealm();
-        gatewayAuthorizingRealm.setCredentialsMatcher(hashedCredentialsMatcher);
-        return gatewayAuthorizingRealm;
+        JwtAuthorizingRealm jwtAuthorizingRealm = new JwtAuthorizingRealm();
+        jwtAuthorizingRealm.setCredentialsMatcher(jwtCredentialsMatcher);
+        return jwtAuthorizingRealm;
     }
     
-    @Bean("hashedCredentialsMatcher")
-    public HashedCredentialsMatcher hashedCredentialsMatcher() {
+    @Bean("jwtCredentialsMatcher")
+    public JwtCredentialsMatcher jwtCredentialsMatcher() {
         
-        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-        hashedCredentialsMatcher.setHashAlgorithmName("SHA-256");
-        hashedCredentialsMatcher.setHashIterations(6);
-        return hashedCredentialsMatcher;
+        return new JwtCredentialsMatcher();
     }
 }

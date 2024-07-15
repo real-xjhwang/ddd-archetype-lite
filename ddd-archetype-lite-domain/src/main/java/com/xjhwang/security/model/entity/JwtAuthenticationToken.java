@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import org.apache.shiro.authc.AuthenticationToken;
 
 /**
- * 网关鉴权Token
+ * 携带Token时校验
  *
  * @author 黄雪杰 on 2024-07-11 16:00
  */
 @AllArgsConstructor
-public class GatewayAuthenticationToken implements AuthenticationToken {
+public class JwtAuthenticationToken implements AuthenticationToken {
     
     private static final long serialVersionUID = 8801335997925942737L;
     

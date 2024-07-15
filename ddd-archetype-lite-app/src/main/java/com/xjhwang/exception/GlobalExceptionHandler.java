@@ -1,0 +1,45 @@
+package com.xjhwang.exception;
+
+import com.xjhwang.types.enums.ResponseCode;
+import com.xjhwang.types.model.Response;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.ShiroException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * @author xjhwang on 2024/7/15 22:03
+ */
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(ShiroException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public Response<String> handleShiroException(ShiroException e) {
+        
+        log.error(e.getMessage(), e);
+        
+        return Response.<String>builder()
+            .code(ResponseCode.UNAUTHORIZED.getCode())
+            .info(ResponseCode.UNAUTHORIZED.getInfo())
+            .build();
+    }
+    
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public Response<String> handleException(Exception e) {
+        
+        log.error(e.getMessage(), e);
+        
+        return Response.<String>builder()
+            .code(ResponseCode.UNKNOWN_ERROR.getCode())
+            .info(ResponseCode.UNKNOWN_ERROR.getInfo())
+            .build();
+    }
+}
