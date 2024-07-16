@@ -1,6 +1,7 @@
 package com.xjhwang.exception;
 
 import com.xjhwang.types.enums.ResponseCode;
+import com.xjhwang.types.exception.ApplicationException;
 import com.xjhwang.types.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
@@ -27,6 +28,19 @@ public class GlobalExceptionHandler {
         return Response.<String>builder()
             .code(ResponseCode.UNAUTHORIZED.getCode())
             .info(ResponseCode.UNAUTHORIZED.getInfo())
+            .build();
+    }
+    
+    @ExceptionHandler(ApplicationException.class)
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public Response<String> handleApplicationException(ApplicationException e) {
+        
+        log.error(e.getMessage(), e);
+        
+        return Response.<String>builder()
+            .code(e.getCode())
+            .info(e.getInfo())
             .build();
     }
     
