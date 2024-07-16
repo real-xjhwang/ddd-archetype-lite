@@ -20,6 +20,9 @@ public class ErrorDispatchController {
     public Response<?> unauthorized(HttpServletRequest request) {
         
         Exception exception = (Exception)request.getAttribute("exception");
+        if (exception instanceof ShiroException) {
+            throw (ShiroException)exception;
+        }
         throw new ShiroException(exception.getMessage(), exception);
     }
 }

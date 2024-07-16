@@ -1,6 +1,7 @@
 package com.xjhwang.security.service;
 
 import com.xjhwang.security.model.entity.JwtAuthenticationToken;
+import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.util.IdUtils;
 import com.xjhwang.types.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         
         if (!isLoginAttempt(request, response)) {
-            return true;
+            return false;
         }
         try {
             executeLogin(request, response);
@@ -54,15 +55,23 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     }
     
     @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         
-        throw new ShiroException("访问被拒绝");
+        request.setAttribute("exception", new AuthenticationException(ResponseCode.UNAUTHORIZED.getInfo()));
+        request.getRequestDispatcher("/v1/error/unauthorized").forward(request, response);
+        return false;
     }
     
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
         
-        throw e;
+        request.setAttribute("exception", e);
+        try {
+            request.getRequestDispatcher("/v1/error/unauthorized").forward(request, response);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
+        return false;
     }
     
     @Override
