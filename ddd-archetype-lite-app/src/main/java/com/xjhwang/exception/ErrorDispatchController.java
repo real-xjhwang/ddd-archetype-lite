@@ -1,4 +1,4 @@
-package com.xjhwang.trigger.http;
+package com.xjhwang.exception;
 
 import com.xjhwang.types.model.Response;
 import lombok.extern.slf4j.Slf4j;
