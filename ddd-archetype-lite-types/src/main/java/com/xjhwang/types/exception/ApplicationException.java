@@ -21,20 +21,21 @@ public class ApplicationException extends RuntimeException implements Serializab
     
     public ApplicationException(ResponseCode responseCode, Throwable cause) {
         
+        super(responseCode.getInfo(), cause);
         this.code = responseCode.getCode();
         this.info = responseCode.getInfo();
-        initCause(cause);
     }
     
     public ApplicationException(Throwable cause) {
         
+        super(cause);
         this.code = ResponseCode.UNKNOWN_ERROR.getCode();
         this.info = ResponseCode.UNKNOWN_ERROR.getInfo();
-        initCause(cause);
     }
     
     public ApplicationException(ResponseCode responseCode) {
         
+        super(responseCode.getInfo());
         this.code = responseCode.getCode();
         this.info = responseCode.getInfo();
     }
