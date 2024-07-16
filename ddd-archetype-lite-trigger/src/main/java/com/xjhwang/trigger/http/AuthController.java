@@ -13,6 +13,7 @@ import com.xjhwang.types.model.Response;
 import com.xjhwang.types.util.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +35,7 @@ public class AuthController implements IAuthService {
     
     @PostMapping("sign-in")
     @Override
-    public Response<String> signIn(SignInRequestDto requestDto) {
+    public Response<String> signIn(@RequestBody SignInRequestDto requestDto) {
         
         Assert.notBlank(requestDto.getUsername(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
         Assert.notBlank(requestDto.getPassword(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
@@ -53,7 +54,7 @@ public class AuthController implements IAuthService {
     
     @PostMapping("sign-up")
     @Override
-    public Response<?> signUp(SignUpRequestDto requestDto) {
+    public Response<?> signUp(@RequestBody SignUpRequestDto requestDto) {
         
         Assert.notBlank(requestDto.getUsername(), () -> new ApplicationException(ResponseCode.USERNAME_IS_BLANK));
         Assert.notBlank(requestDto.getPassword(), () -> new ApplicationException(ResponseCode.PASSWORD_IS_BLANK));
