@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.web.filter.authc.AnonymousFilter;
@@ -87,5 +88,11 @@ public class GatewayConfig {
     public JwtCredentialsMatcher jwtCredentialsMatcher() {
         
         return new JwtCredentialsMatcher();
+    }
+    
+    @Bean("lifecycleBeanPostProcessor")
+    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
+        
+        return new LifecycleBeanPostProcessor();
     }
 }
