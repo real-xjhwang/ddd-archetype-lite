@@ -13,4 +13,6 @@ public interface SysUserDao {
     int insert(@Param("sysUser") SysUser sysUser);
     
     int deleteById(@Param("id") String id);
+    
+    SysUser getUserByUsername(@Param("username") String username);
 }

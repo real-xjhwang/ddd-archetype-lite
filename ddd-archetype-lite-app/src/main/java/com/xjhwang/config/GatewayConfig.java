@@ -5,6 +5,7 @@ import com.xjhwang.security.service.JwtFilter;
 import com.xjhwang.security.service.JwtAuthorizingRealm;
 import com.xjhwang.types.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
@@ -94,5 +95,11 @@ public class GatewayConfig {
     public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
         
         return new LifecycleBeanPostProcessor();
+    }
+    
+    @Bean("defaultPasswordService")
+    public DefaultPasswordService defaultPasswordService() {
+        
+        return new DefaultPasswordService();
     }
 }

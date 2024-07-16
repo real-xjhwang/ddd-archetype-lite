@@ -25,4 +25,8 @@
     <delete id="deleteById">
         UPDATE `sys_user` SET `is_deleted` = TRUE WHERE `id` = #{id}
     </delete>
+
+    <select id="getUserByUsername" resultMap="defaultResultMap">
+        SELECT * FROM sys_user WHERE is_deleted = TRUE AND username = #{username}
+    </select>
 </mapper>

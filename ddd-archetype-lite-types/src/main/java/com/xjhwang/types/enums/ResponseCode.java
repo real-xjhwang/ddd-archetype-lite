@@ -15,6 +15,8 @@ public enum ResponseCode {
     ILLEGAL_PARAMETER("0002", "非法参数"),
     INDEX_DUP("0003", "唯一索引冲突"),
     UNAUTHORIZED("0004", "无权访问"),
+    
+    USERNAME_OR_PASSWORD_INVALID("10001", "用户名或密码错误"),
     ;
     
     private final String code;
