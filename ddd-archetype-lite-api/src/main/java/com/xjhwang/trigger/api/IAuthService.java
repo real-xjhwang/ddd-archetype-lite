@@ -1,6 +1,7 @@
 package com.xjhwang.trigger.api;
 
 import com.xjhwang.trigger.dto.SignInRequestDto;
+import com.xjhwang.trigger.dto.SignUpRequestDto;
 import com.xjhwang.types.model.Response;
 
 /**
@@ -15,4 +16,12 @@ public interface IAuthService {
      * @return token
      */
     Response<String> signIn(SignInRequestDto requestDto);
+    
+    /**
+     * 注册
+     *
+     * @param requestDto 身份信息
+     * @return 注册结果
+     */
+    Response<?> signUp(SignUpRequestDto requestDto);
 }

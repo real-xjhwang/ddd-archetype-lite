@@ -16,4 +16,11 @@ public interface ISecurityRepository {
      * @return 用户信息
      */
     UserEntity getUserByUsername(String username);
+    
+    /**
+     * 保存用户
+     *
+     * @param userEntity 用户信息
+     */
+    void saveSysUser(UserEntity userEntity);
 }

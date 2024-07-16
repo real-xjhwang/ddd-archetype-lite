@@ -17,6 +17,9 @@ public enum ResponseCode {
     UNAUTHORIZED("0004", "无权访问"),
     
     USERNAME_OR_PASSWORD_INVALID("10001", "用户名或密码错误"),
+    USERNAME_IS_BLANK("10002", "用户名为空"),
+    PASSWORD_IS_BLANK("10003", "密码为空"),
+    USER_ALREADY_EXISTS("10004", "用户已存在"),
     ;
     
     private final String code;

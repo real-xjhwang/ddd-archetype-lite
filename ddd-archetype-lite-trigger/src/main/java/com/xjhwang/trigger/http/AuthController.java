@@ -1,14 +1,18 @@
 package com.xjhwang.trigger.http;
 
 import com.xjhwang.security.model.entity.SignInSubjectEntity;
+import com.xjhwang.security.model.entity.SignUpSubjectEntity;
 import com.xjhwang.security.service.identify.ISignInService;
+import com.xjhwang.security.service.identify.ISignUpService;
 import com.xjhwang.trigger.api.IAuthService;
 import com.xjhwang.trigger.dto.SignInRequestDto;
+import com.xjhwang.trigger.dto.SignUpRequestDto;
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
 import com.xjhwang.types.model.Response;
 import com.xjhwang.types.util.Assert;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +29,10 @@ public class AuthController implements IAuthService {
     @Resource
     private ISignInService signInService;
     
+    @Resource
+    private ISignUpService signUpService;
+    
+    @PostMapping("sign-in")
     @Override
     public Response<String> signIn(SignInRequestDto requestDto) {
         
@@ -40,6 +48,26 @@ public class AuthController implements IAuthService {
             .code(ResponseCode.SUCCESS.getCode())
             .info(ResponseCode.SUCCESS.getInfo())
             .data(token)
+            .build();
+    }
+    
+    @PostMapping("sign-up")
+    @Override
+    public Response<?> signUp(SignUpRequestDto requestDto) {
+        
+        Assert.notBlank(requestDto.getUsername(), () -> new ApplicationException(ResponseCode.USERNAME_IS_BLANK));
+        Assert.notBlank(requestDto.getPassword(), () -> new ApplicationException(ResponseCode.PASSWORD_IS_BLANK));
+        
+        SignUpSubjectEntity signUpSubjectEntity = SignUpSubjectEntity.builder()
+            .username(requestDto.getUsername())
+            .password(requestDto.getPassword())
+            .phone(requestDto.getPhone())
+            .email(requestDto.getEmail())
+            .build();
+        signUpService.signUp(signUpSubjectEntity);
+        return Response.builder()
+            .code(ResponseCode.SUCCESS.getCode())
+            .info(ResponseCode.SUCCESS.getInfo())
             .build();
     }
 }
