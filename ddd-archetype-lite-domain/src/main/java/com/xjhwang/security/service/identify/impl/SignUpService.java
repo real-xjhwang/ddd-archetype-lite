@@ -7,6 +7,7 @@ import com.xjhwang.security.service.identify.ISignUpService;
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.credential.PasswordService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -21,6 +22,9 @@ public class SignUpService implements ISignUpService {
     @Resource
     private ISecurityRepository securityRepository;
     
+    @Resource
+    private PasswordService passwordService;
+    
     @Override
     public void signUp(SignUpSubjectEntity signUpSubjectEntity) {
         
@@ -28,9 +32,11 @@ public class SignUpService implements ISignUpService {
         if (userEntity != null) {
             throw new ApplicationException(ResponseCode.USER_ALREADY_EXISTS);
         }
+        // 密码加密
+        String encryptPassword = passwordService.encryptPassword(signUpSubjectEntity.getPassword());
         userEntity = UserEntity.builder()
             .username(signUpSubjectEntity.getUsername())
-            .password(signUpSubjectEntity.getPassword())
+            .password(encryptPassword)
             .phone(signUpSubjectEntity.getPhone())
             .email(signUpSubjectEntity.getEmail())
             .build();
