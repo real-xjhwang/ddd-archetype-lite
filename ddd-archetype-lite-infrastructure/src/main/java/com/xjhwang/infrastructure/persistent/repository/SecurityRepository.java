@@ -7,6 +7,7 @@ import com.xjhwang.security.repository.ISecurityRepository;
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
 import com.xjhwang.types.util.IdUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -61,9 +62,13 @@ public class SecurityRepository implements ISecurityRepository {
         sysUser.setPhone(userEntity.getPhone());
         sysUser.setEmail(userEntity.getEmail());
         transactionTemplate.execute(status -> {
-            int affectedRows = sysUserDao.insert(sysUser);
-            if (affectedRows <= 0) {
-                throw new ApplicationException(ResponseCode.UNKNOWN_ERROR);
+            try {
+                int affectedRows = sysUserDao.insert(sysUser);
+                if (affectedRows <= 0) {
+                    throw new ApplicationException(ResponseCode.UNKNOWN_ERROR);
+                }
+            } catch (DuplicateKeyException duplicateKeyException) {
+                throw new ApplicationException(ResponseCode.INDEX_DUP, duplicateKeyException);
             }
             return status;
         });
