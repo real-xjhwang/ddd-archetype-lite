@@ -40,7 +40,7 @@ public class SignInService implements ISignInService {
             throw new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID);
         }
         // 比对密码
-        if (passwordService.passwordsMatch(password, userEntity.getPassword())) {
+        if (!passwordService.passwordsMatch(password, userEntity.getPassword())) {
             throw new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID);
         }
         return jwtProvider.encode(username, 10 * 60 * 1000, null);
