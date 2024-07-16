@@ -5,6 +5,7 @@ import com.xjhwang.types.util.IdUtils;
 import com.xjhwang.types.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,9 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
             executeLogin(request, response);
             return true;
         } catch (Exception e) {
+            if (e instanceof ShiroException) {
+                throw (ShiroException) e;
+            }
             throw new ShiroException(e);
         }
     }
@@ -53,6 +57,12 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) {
         
         throw new ShiroException("访问被拒绝");
+    }
+    
+    @Override
+    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
+        
+        throw e;
     }
     
     @Override
