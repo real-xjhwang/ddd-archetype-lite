@@ -1,18 +1,19 @@
 package com.xjhwang.config;
 
-import com.xjhwang.security.service.JwtCredentialsMatcher;
-import com.xjhwang.security.service.JwtFilter;
-import com.xjhwang.security.service.JwtAuthorizingRealm;
+import com.xjhwang.infrastructure.persistent.repository.SecurityRepository;
+import com.xjhwang.security.service.*;
+import com.xjhwang.types.util.CollectionUtils;
 import com.xjhwang.types.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.credential.DefaultPasswordService;
+import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
-import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -35,11 +36,11 @@ public class GatewayConfig {
         
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
-        shiroFilterFactoryBean.setLoginUrl("/v1/sign-in");
+        shiroFilterFactoryBean.setLoginUrl("/v1/auth/sign-in");
+        shiroFilterFactoryBean.setSuccessUrl("/v1/success");
         shiroFilterFactoryBean.setUnauthorizedUrl("/v1/error/unauthorized");
         
         Map<String, Filter> filters = MapUtils.builder(new HashMap<String, Filter>())
-            .put("anon", new AnonymousFilter())
             .put("jwt", new JwtFilter())
             .build();
         shiroFilterFactoryBean.setFilters(filters);
@@ -48,10 +49,13 @@ public class GatewayConfig {
     }
     
     @Bean("defaultWebSecurityManager")
-    public DefaultWebSecurityManager defaultWebSecurityManager(@Qualifier("gatewayAuthorizingRealm") JwtAuthorizingRealm jwtAuthorizingRealm) {
+    public DefaultWebSecurityManager defaultWebSecurityManager(@Qualifier("multiRealmAuthenticator") MultiRealmAuthenticator multiRealmAuthenticator,
+        @Qualifier("jwtAuthorizingRealm") JwtAuthorizingRealm jwtAuthorizingRealm,
+        @Qualifier("shiroAuthorizingRealm") ShiroAuthorizingRealm shiroAuthorizingRealm) {
         
         DefaultWebSecurityManager defaultWebSecurityManager = new DefaultWebSecurityManager();
-        defaultWebSecurityManager.setRealm(jwtAuthorizingRealm);
+        defaultWebSecurityManager.setAuthenticator(multiRealmAuthenticator);
+        defaultWebSecurityManager.setRealms(CollectionUtils.newArrayList(jwtAuthorizingRealm, shiroAuthorizingRealm));
         // 关闭ShiroDao
         DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
         DefaultSessionStorageEvaluator defaultSessionStorageEvaluator = new DefaultSessionStorageEvaluator();
@@ -73,22 +77,43 @@ public class GatewayConfig {
         // 异常分发接口不需要认证
         defaultShiroFilterChainDefinition.addPathDefinition("/v1/error/**", "anon");
         // 其余接口都需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/**", "jwt");
+        defaultShiroFilterChainDefinition.addPathDefinition("/**", "jwt,authc");
         return defaultShiroFilterChainDefinition;
     }
     
-    @Bean("gatewayAuthorizingRealm")
-    public JwtAuthorizingRealm gatewayAuthorizingRealm(@Qualifier("jwtCredentialsMatcher") JwtCredentialsMatcher jwtCredentialsMatcher) {
+    @Bean("multiRealmAuthenticator")
+    public MultiRealmAuthenticator multiRealmAuthenticator() {
         
-        JwtAuthorizingRealm jwtAuthorizingRealm = new JwtAuthorizingRealm();
+        MultiRealmAuthenticator multiRealmAuthenticator = new MultiRealmAuthenticator();
+        // 设置多 Realm 的认证策略，默认 AtLeastOneSuccessfulStrategy
+        FirstSuccessfulStrategy firstSuccessfulStrategy = new FirstSuccessfulStrategy();
+        multiRealmAuthenticator.setAuthenticationStrategy(firstSuccessfulStrategy);
+        return multiRealmAuthenticator;
+    }
+    
+    @Bean("jwtAuthorizingRealm")
+    public JwtAuthorizingRealm jwtAuthorizingRealm(@Qualifier("jwtCredentialsMatcher") JwtCredentialsMatcher jwtCredentialsMatcher,
+        @Qualifier("jwtProvider") JwtProvider jwtProvider,
+        @Qualifier("securityRepository") SecurityRepository securityRepository) {
+        
+        JwtAuthorizingRealm jwtAuthorizingRealm = new JwtAuthorizingRealm(jwtProvider, securityRepository);
         jwtAuthorizingRealm.setCredentialsMatcher(jwtCredentialsMatcher);
         return jwtAuthorizingRealm;
     }
     
-    @Bean("jwtCredentialsMatcher")
-    public JwtCredentialsMatcher jwtCredentialsMatcher() {
+    @Bean
+    public ShiroAuthorizingRealm shiroAuthorizingRealm(@Qualifier("hashedCredentialsMatcher") HashedCredentialsMatcher hashedCredentialsMatcher,
+        @Qualifier("securityRepository") SecurityRepository securityRepository) {
         
-        return new JwtCredentialsMatcher();
+        ShiroAuthorizingRealm shiroAuthorizingRealm = new ShiroAuthorizingRealm(securityRepository);
+        shiroAuthorizingRealm.setCredentialsMatcher(hashedCredentialsMatcher);
+        return shiroAuthorizingRealm;
+    }
+    
+    @Bean("jwtCredentialsMatcher")
+    public JwtCredentialsMatcher jwtCredentialsMatcher(@Qualifier("jwtProvider") JwtProvider jwtProvider) {
+        
+        return new JwtCredentialsMatcher(jwtProvider);
     }
     
     @Bean("lifecycleBeanPostProcessor")
@@ -97,9 +122,26 @@ public class GatewayConfig {
         return new LifecycleBeanPostProcessor();
     }
     
-    @Bean("defaultPasswordService")
-    public DefaultPasswordService defaultPasswordService() {
+    /**
+     * 对 Spring Bean 开启 Shiro 注解的支持
+     *
+     * @param securityManager SecurityManager
+     * @return AuthorizationAttributeSourceAdvisor
+     */
+    @Bean("authorizationAttributeSourceAdvisor")
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(@Qualifier("defaultWebSecurityManager") SecurityManager securityManager) {
         
-        return new DefaultPasswordService();
+        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
+        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager);
+        return authorizationAttributeSourceAdvisor;
+    }
+    
+    @Bean("hashedCredentialsMatcher")
+    public HashedCredentialsMatcher hashedCredentialsMatcher() {
+        
+        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+        hashedCredentialsMatcher.setHashAlgorithmName("md5");
+        hashedCredentialsMatcher.setHashIterations(2);
+        return hashedCredentialsMatcher;
     }
 }

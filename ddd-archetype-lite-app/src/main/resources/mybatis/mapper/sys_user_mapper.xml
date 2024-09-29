@@ -13,6 +13,7 @@
         <result property="deleted" column="is_deleted"/>
         <result property="username" column="username"/>
         <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
     </resultMap>
@@ -23,10 +24,18 @@
     </insert>
 
     <delete id="deleteById">
-        UPDATE `sys_user` SET `is_deleted` = TRUE WHERE `id` = #{id}
+        UPDATE `sys_user` SET `is_deleted` = FALSE WHERE `id` = #{id}
     </delete>
 
     <select id="getUserByUsername" resultMap="defaultResultMap">
         SELECT * FROM sys_user WHERE is_deleted = FALSE AND username = #{username}
+    </select>
+
+    <select id="getUserById" resultMap="defaultResultMap">
+        SELECT * FROM sys_user WHERE is_deleted = FALSE AND id = #{id}
+    </select>
+
+    <select id="getUserByPhone" resultMap="defaultResultMap">
+        SELECT * FROM sys_user WHERE is_deleted = FALSE AND phone = #{phone}
     </select>
 </mapper>

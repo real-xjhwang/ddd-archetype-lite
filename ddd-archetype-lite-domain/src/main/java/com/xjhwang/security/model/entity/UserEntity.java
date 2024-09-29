@@ -17,6 +17,11 @@ import lombok.NoArgsConstructor;
 public class UserEntity {
     
     /**
+     * 用户ID
+     */
+    private String id;
+    
+    /**
      * 用户名
      */
     private String username;
@@ -25,6 +30,11 @@ public class UserEntity {
      * 密码
      */
     private String password;
+    
+    /**
+     * 盐值
+     */
+    private String salt;
     
     /**
      * 手机号

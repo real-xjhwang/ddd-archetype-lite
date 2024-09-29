@@ -26,6 +26,11 @@ public class SysUser extends BasePo {
     private String password;
     
     /**
+     * 盐值
+     */
+    private String salt;
+    
+    /**
      * 手机号
      */
     private String phone;

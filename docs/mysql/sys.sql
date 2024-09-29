@@ -71,6 +71,7 @@ CREATE TABLE `sys_user`
     `id`          char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NOT NULL COMMENT '主键ID',
     `username`    varchar(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '用户名',
     `password`    varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '密码',
+    `salt`        varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci  NOT NULL COMMENT '盐值',
     `phone`       char(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci     NULL     DEFAULT '' COMMENT '手机号',
     `email`       varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL     DEFAULT '' COMMENT '邮箱',
     `create_time` datetime                                                      NOT NULL COMMENT '创建时间',

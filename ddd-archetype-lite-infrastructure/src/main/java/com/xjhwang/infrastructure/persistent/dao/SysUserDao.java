@@ -15,4 +15,8 @@ public interface SysUserDao {
     int deleteById(@Param("id") String id);
     
     SysUser getUserByUsername(@Param("username") String username);
+    
+    SysUser getUserById(@Param("id") String id);
+    
+    SysUser getUserByPhone(@Param("phone") String phone);
 }

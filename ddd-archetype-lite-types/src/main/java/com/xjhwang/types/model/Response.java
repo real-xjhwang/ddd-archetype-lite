@@ -1,5 +1,6 @@
 package com.xjhwang.types.model;
 
+import com.xjhwang.types.enums.ResponseCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,4 +35,32 @@ public class Response<T> implements Serializable {
      * 业务数据
      */
     private T data;
+    
+    
+    /**
+     * 请求成功，无响应内容时的默认响应
+     *
+     * @param <T>  响应内容类型
+     * @return 响应实体
+     */
+    public static <T> Response<T> success() {
+        
+        return success(null);
+    }
+    
+    /**
+     * 请求成功，有响应内容时的默认响应
+     *
+     * @param data 响应内容
+     * @param <T>  响应内容类型
+     * @return 响应实体
+     */
+    public static <T> Response<T> success(T data) {
+        
+        return Response.<T>builder()
+            .code(ResponseCode.SUCCESS.getCode())
+            .info(ResponseCode.SUCCESS.getInfo())
+            .data(data)
+            .build();
+    }
 }

@@ -13,9 +13,9 @@ public class SignInRequestDto implements Serializable {
     private static final long serialVersionUID = -1521636986946587258L;
     
     /**
-     * 用户名
+     * 电话
      */
-    private String username;
+    private String phone;
     
     /**
      * 密码

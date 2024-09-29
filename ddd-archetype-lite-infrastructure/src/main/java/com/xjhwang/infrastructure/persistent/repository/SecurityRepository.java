@@ -47,6 +47,7 @@ public class SecurityRepository implements ISecurityRepository {
         return UserEntity.builder()
             .username(sysUser.getUsername())
             .password(sysUser.getPassword())
+            .salt(sysUser.getSalt())
             .phone(sysUser.getPhone())
             .email(sysUser.getEmail())
             .build();
@@ -72,5 +73,39 @@ public class SecurityRepository implements ISecurityRepository {
             }
             return status;
         });
+    }
+    
+    @Override
+    public UserEntity getUserById(String id) {
+        
+        SysUser sysUser = sysUserDao.getUserById(id);
+        if (sysUser == null) {
+            return null;
+        }
+        return UserEntity.builder()
+            .id(sysUser.getId())
+            .username(sysUser.getUsername())
+            .password(sysUser.getPassword())
+            .salt(sysUser.getSalt())
+            .phone(sysUser.getPhone())
+            .email(sysUser.getEmail())
+            .build();
+    }
+    
+    @Override
+    public UserEntity getUserByPhone(String phone) {
+        
+        SysUser sysUser = sysUserDao.getUserByPhone(phone);
+        if (sysUser == null) {
+            return null;
+        }
+        return UserEntity.builder()
+            .id(sysUser.getId())
+            .username(sysUser.getUsername())
+            .password(sysUser.getPassword())
+            .salt(sysUser.getSalt())
+            .phone(sysUser.getPhone())
+            .email(sysUser.getEmail())
+            .build();
     }
 }

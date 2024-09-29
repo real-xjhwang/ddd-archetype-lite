@@ -1,6 +1,8 @@
 package com.xjhwang.security.service;
 
 import com.xjhwang.security.model.entity.JwtAuthenticationToken;
+import com.xjhwang.security.model.entity.UserEntity;
+import com.xjhwang.security.repository.ISecurityRepository;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -10,7 +12,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import javax.annotation.Resource;
 import java.util.Date;
 
 /**
@@ -20,8 +21,15 @@ import java.util.Date;
  */
 public class JwtAuthorizingRealm extends AuthorizingRealm {
     
-    @Resource
-    private JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
+    
+    private final ISecurityRepository securityRepository;
+    
+    public JwtAuthorizingRealm(JwtProvider jwtProvider, ISecurityRepository securityRepository) {
+        
+        this.jwtProvider = jwtProvider;
+        this.securityRepository = securityRepository;
+    }
     
     @Override
     public Class<?> getAuthenticationTokenClass() {
@@ -54,6 +62,12 @@ public class JwtAuthorizingRealm extends AuthorizingRealm {
         if (claims.getExpiration() != null && claims.getExpiration().before(new Date())) {
             throw new AuthenticationException("无效令牌");
         }
-        return new SimpleAuthenticationInfo(claims.getSubject(), token.getCredentials(), getName());
+        // 获取用户电话
+        String subject = claims.getSubject();
+        UserEntity userEntity = securityRepository.getUserByPhone(subject);
+        if (userEntity == null) {
+            throw new AuthenticationException("无效令牌");
+        }
+        return new SimpleAuthenticationInfo(subject, token.getCredentials(), getName());
     }
 }

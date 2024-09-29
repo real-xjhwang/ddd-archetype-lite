@@ -20,6 +20,7 @@ public enum ResponseCode {
     USERNAME_IS_BLANK("10002", "用户名为空"),
     PASSWORD_IS_BLANK("10003", "密码为空"),
     USER_ALREADY_EXISTS("10004", "用户已存在"),
+    PHONE_IS_BLANK("10005", "电话为空"),
     ;
     
     private final String code;

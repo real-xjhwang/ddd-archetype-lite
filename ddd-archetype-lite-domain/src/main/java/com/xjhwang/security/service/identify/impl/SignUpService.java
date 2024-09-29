@@ -6,8 +6,10 @@ import com.xjhwang.security.repository.ISecurityRepository;
 import com.xjhwang.security.service.identify.ISignUpService;
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
+import com.xjhwang.types.util.IdUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.credential.PasswordService;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.util.ByteSource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -22,21 +24,22 @@ public class SignUpService implements ISignUpService {
     @Resource
     private ISecurityRepository securityRepository;
     
-    @Resource
-    private PasswordService passwordService;
-    
     @Override
     public void signUp(SignUpSubjectEntity signUpSubjectEntity) {
         
-        UserEntity userEntity = securityRepository.getUserByUsername(signUpSubjectEntity.getUsername());
+        UserEntity userEntity = securityRepository.getUserByPhone(signUpSubjectEntity.getPhone());
         if (userEntity != null) {
             throw new ApplicationException(ResponseCode.USER_ALREADY_EXISTS);
         }
-        // 密码加密
-        String encryptPassword = passwordService.encryptPassword(signUpSubjectEntity.getPassword());
+        // 加盐
+        String salt = IdUtils.simpleUUID();
+        // 加密
+        String encodedPassword = new SimpleHash("md5", signUpSubjectEntity.getPassword(), ByteSource.Util.bytes(salt), 2).toHex();
+        
         userEntity = UserEntity.builder()
             .username(signUpSubjectEntity.getUsername())
-            .password(encryptPassword)
+            .password(encodedPassword)
+            .salt(salt)
             .phone(signUpSubjectEntity.getPhone())
             .email(signUpSubjectEntity.getEmail())
             .build();

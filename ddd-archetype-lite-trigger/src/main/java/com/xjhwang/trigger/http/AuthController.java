@@ -37,19 +37,15 @@ public class AuthController implements IAuthService {
     @Override
     public Response<String> signIn(@RequestBody SignInRequestDto requestDto) {
         
-        Assert.notBlank(requestDto.getUsername(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
+        Assert.notBlank(requestDto.getPhone(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
         Assert.notBlank(requestDto.getPassword(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
         
         SignInSubjectEntity signInSubjectEntity = SignInSubjectEntity.builder()
-            .username(requestDto.getUsername())
+            .phone(requestDto.getPhone())
             .password(requestDto.getPassword())
             .build();
         String token = signInService.signIn(signInSubjectEntity);
-        return Response.<String>builder()
-            .code(ResponseCode.SUCCESS.getCode())
-            .info(ResponseCode.SUCCESS.getInfo())
-            .data(token)
-            .build();
+        return Response.success(token);
     }
     
     @PostMapping("sign-up")
@@ -57,6 +53,7 @@ public class AuthController implements IAuthService {
     public Response<?> signUp(@RequestBody SignUpRequestDto requestDto) {
         
         Assert.notBlank(requestDto.getUsername(), () -> new ApplicationException(ResponseCode.USERNAME_IS_BLANK));
+        Assert.notBlank(requestDto.getPhone(), () -> new ApplicationException(ResponseCode.PHONE_IS_BLANK));
         Assert.notBlank(requestDto.getPassword(), () -> new ApplicationException(ResponseCode.PASSWORD_IS_BLANK));
         
         SignUpSubjectEntity signUpSubjectEntity = SignUpSubjectEntity.builder()
@@ -66,9 +63,6 @@ public class AuthController implements IAuthService {
             .email(requestDto.getEmail())
             .build();
         signUpService.signUp(signUpSubjectEntity);
-        return Response.builder()
-            .code(ResponseCode.SUCCESS.getCode())
-            .info(ResponseCode.SUCCESS.getInfo())
-            .build();
+        return Response.success();
     }
 }
