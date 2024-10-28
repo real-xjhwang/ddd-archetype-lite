@@ -1,9 +1,9 @@
 package com.xjhwang.trigger.http;
 
-import com.xjhwang.security.model.entity.SignInSubjectEntity;
-import com.xjhwang.security.model.entity.SignUpSubjectEntity;
-import com.xjhwang.security.service.identify.ISignInService;
-import com.xjhwang.security.service.identify.ISignUpService;
+import com.xjhwang.domain.security.model.entity.SignInSubjectEntity;
+import com.xjhwang.domain.security.model.entity.SignUpSubjectEntity;
+import com.xjhwang.domain.security.service.identify.ISignInService;
+import com.xjhwang.domain.security.service.identify.ISignUpService;
 import com.xjhwang.trigger.api.IAuthService;
 import com.xjhwang.trigger.dto.SignInRequestDto;
 import com.xjhwang.trigger.dto.SignUpRequestDto;

@@ -2,8 +2,8 @@ package com.xjhwang.infrastructure.persistent.repository;
 
 import com.xjhwang.infrastructure.persistent.dao.*;
 import com.xjhwang.infrastructure.persistent.po.SysUser;
-import com.xjhwang.security.model.entity.UserEntity;
-import com.xjhwang.security.repository.ISecurityRepository;
+import com.xjhwang.domain.security.model.entity.UserEntity;
+import com.xjhwang.domain.security.repository.ISecurityRepository;
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
 import com.xjhwang.types.util.IdUtils;
