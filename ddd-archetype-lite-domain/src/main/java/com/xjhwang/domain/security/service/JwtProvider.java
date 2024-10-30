@@ -1,11 +1,20 @@
 package com.xjhwang.domain.security.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.xjhwang.types.enums.ResponseCode;
+import com.xjhwang.types.exception.ApplicationException;
+import com.xjhwang.types.util.IdUtils;
 import com.xjhwang.types.util.StringUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +29,7 @@ import java.util.Map;
  *
  * @author 黄雪杰 on 2024-07-11 16:05
  */
+@Slf4j
 @Component
 public class JwtProvider {
     
@@ -44,6 +54,7 @@ public class JwtProvider {
         Date now = new Date(nowMillis);
         // 签发
         JwtBuilder jwtBuilder = Jwts.builder()
+            .id(IdUtils.fastSimpleUUID())
             .claims(claims)
             .issuedAt(now)
             .subject(subject)
@@ -67,18 +78,20 @@ public class JwtProvider {
             .getPayload();
     }
     
-    public void verify(String token, String phone) {
+    public void verify(String token) {
         
-        Claims claims = decode(token);
-        Date expiration = claims.getExpiration();
-        if (expiration != null && expiration.before(new Date())) {
-            throw new IllegalStateException("无效令牌");
-        }
-        if (!StringUtils.equals(issuer, claims.getIssuer())) {
-            throw new IllegalStateException("无效令牌");
-        }
-        if (!StringUtils.equals(phone, claims.getSubject())) {
-            throw new IllegalStateException("无效令牌");
+        JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(signKey.getEncoded())).build();
+        try {
+            jwtVerifier.verify(token);
+        } catch (SignatureVerificationException e) {
+            log.error("Token - 签名无效", e);
+            throw new ApplicationException(ResponseCode.TOKEN_SIGNATURE_INVALID);
+        } catch (TokenExpiredException e) {
+            log.error("Token - 过期", e);
+            throw new ApplicationException(ResponseCode.TOKEN_EXPIRED);
+        } catch (Exception e) {
+            log.error("Token - 无效", e);
+            throw new ApplicationException(ResponseCode.TOKEN_INVALID);
         }
     }
     

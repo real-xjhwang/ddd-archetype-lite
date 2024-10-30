@@ -24,7 +24,7 @@ public class JwtCredentialsMatcher implements CredentialsMatcher {
         String token = (String)authenticationToken.getCredentials();
         try {
             // 验证token正确性
-            jwtProvider.verify(token, ((String)authenticationInfo.getPrincipals().getPrimaryPrincipal()));
+            jwtProvider.verify(token);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
