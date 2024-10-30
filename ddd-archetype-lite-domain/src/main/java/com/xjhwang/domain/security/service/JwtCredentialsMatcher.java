@@ -26,7 +26,7 @@ public class JwtCredentialsMatcher implements CredentialsMatcher {
             // 验证token正确性
             jwtProvider.verify(token);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            log.error("Token - 验证不通过", e);
             return false;
         }
         return true;

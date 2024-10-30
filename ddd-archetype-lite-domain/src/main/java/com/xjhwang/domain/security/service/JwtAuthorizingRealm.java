@@ -12,8 +12,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import java.util.Date;
-
 /**
  * 携带Token时校验
  *
@@ -48,20 +46,7 @@ public class JwtAuthorizingRealm extends AuthorizingRealm {
         // 获取凭证
         String jwt = (String)token.getCredentials();
         // 解析凭证
-        Claims claims;
-        try {
-            claims = jwtProvider.decode(jwt);
-        } catch (Exception e) {
-            throw new AuthenticationException("无效令牌", e);
-        }
-        // 签发人不匹配，无效token
-        if (!jwtProvider.getIssuer().equals(claims.getIssuer())) {
-            throw new AuthenticationException("无效令牌");
-        }
-        // token过期
-        if (claims.getExpiration() != null && claims.getExpiration().before(new Date())) {
-            throw new AuthenticationException("无效令牌");
-        }
+        Claims claims = jwtProvider.decode(jwt);
         // 获取用户电话
         String subject = claims.getSubject();
         UserEntity userEntity = securityRepository.getUserByPhone(subject);

@@ -84,13 +84,10 @@ public class JwtProvider {
         try {
             jwtVerifier.verify(token);
         } catch (SignatureVerificationException e) {
-            log.error("Token - 签名无效", e);
             throw new ApplicationException(ResponseCode.TOKEN_SIGNATURE_INVALID);
         } catch (TokenExpiredException e) {
-            log.error("Token - 过期", e);
             throw new ApplicationException(ResponseCode.TOKEN_EXPIRED);
         } catch (Exception e) {
-            log.error("Token - 无效", e);
             throw new ApplicationException(ResponseCode.TOKEN_INVALID);
         }
     }
