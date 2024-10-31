@@ -1,9 +1,11 @@
 package com.xjhwang.config;
 
+import com.xjhwang.domain.security.service.*;
 import com.xjhwang.infrastructure.persistent.repository.SecurityRepository;
 import com.xjhwang.types.util.CollectionUtils;
 import com.xjhwang.types.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
@@ -13,6 +15,7 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
+import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +39,6 @@ public class GatewayConfig {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         shiroFilterFactoryBean.setLoginUrl("/v1/auth/sign-in");
-        shiroFilterFactoryBean.setSuccessUrl("/v1/success");
         shiroFilterFactoryBean.setUnauthorizedUrl("/v1/error/unauthorized");
         
         Map<String, Filter> filters = MapUtils.builder(new HashMap<String, Filter>())
@@ -62,6 +64,9 @@ public class GatewayConfig {
         defaultSessionStorageEvaluator.setSessionStorageEnabled(false);
         subjectDAO.setSessionStorageEvaluator(defaultSessionStorageEvaluator);
         defaultWebSecurityManager.setSubjectDAO(subjectDAO);
+        
+        ThreadContext.bind(defaultWebSecurityManager);
+        SecurityUtils.setSecurityManager(defaultWebSecurityManager);
         return defaultWebSecurityManager;
     }
     
