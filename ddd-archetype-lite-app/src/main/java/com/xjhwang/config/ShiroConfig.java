@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-public class GatewayConfig {
+public class ShiroConfig {
     
     @Bean("shiroFilterFactoryBean")
     public ShiroFilterFactoryBean shiroFilterFactoryBean(@Qualifier("defaultWebSecurityManager") SecurityManager securityManager,
@@ -38,8 +38,6 @@ public class GatewayConfig {
         
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
-        shiroFilterFactoryBean.setLoginUrl("/v1/auth/sign-in");
-        shiroFilterFactoryBean.setUnauthorizedUrl("/v1/error/unauthorized");
         
         Map<String, Filter> filters = MapUtils.builder(new HashMap<String, Filter>())
             .put("jwt", new JwtFilter())
@@ -78,8 +76,6 @@ public class GatewayConfig {
         defaultShiroFilterChainDefinition.addPathDefinition("/v1/auth/sign-in", "anon");
         // 注册接口不需要认证
         defaultShiroFilterChainDefinition.addPathDefinition("/v1/auth/sign-up", "anon");
-        // 异常分发接口不需要认证
-        defaultShiroFilterChainDefinition.addPathDefinition("/v1/error/**", "anon");
         // 其余接口都需要认证
         defaultShiroFilterChainDefinition.addPathDefinition("/**", "jwt,authc");
         return defaultShiroFilterChainDefinition;
@@ -97,10 +93,9 @@ public class GatewayConfig {
     
     @Bean("jwtAuthorizingRealm")
     public JwtAuthorizingRealm jwtAuthorizingRealm(@Qualifier("jwtCredentialsMatcher") JwtCredentialsMatcher jwtCredentialsMatcher,
-        @Qualifier("jwtProvider") JwtProvider jwtProvider,
-        @Qualifier("securityRepository") SecurityRepository securityRepository) {
+        @Qualifier("jwtProvider") JwtProvider jwtProvider) {
         
-        JwtAuthorizingRealm jwtAuthorizingRealm = new JwtAuthorizingRealm(jwtProvider, securityRepository);
+        JwtAuthorizingRealm jwtAuthorizingRealm = new JwtAuthorizingRealm(jwtProvider);
         jwtAuthorizingRealm.setCredentialsMatcher(jwtCredentialsMatcher);
         return jwtAuthorizingRealm;
     }

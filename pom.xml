@@ -16,7 +16,6 @@
         <module>ddd-archetype-lite-domain</module>
         <module>ddd-archetype-lite-infrastructure</module>
         <module>ddd-archetype-lite-types</module>
-        <module>ddd-archetype-lite-api</module>
     </modules>
 
     <parent>

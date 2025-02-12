@@ -4,6 +4,7 @@ import com.xjhwang.domain.security.model.entity.UserEntity;
 import com.xjhwang.domain.security.repository.ISecurityRepository;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
@@ -28,7 +29,7 @@ public class ShiroAuthorizingRealm extends AuthorizingRealm {
     
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        // 只能是不处理权限
+        // 不处理权限，权限交由业务层处理
         return null;
     }
     
@@ -39,7 +40,7 @@ public class ShiroAuthorizingRealm extends AuthorizingRealm {
         String phone = (String)token.getPrincipal();
         UserEntity userEntity = securityRepository.getUserByPhone(phone);
         if (userEntity == null) {
-            throw new AuthenticationException("用户不存在");
+            throw new UnauthenticatedException("用户不存在或密码错误");
         }
         
         // 加盐

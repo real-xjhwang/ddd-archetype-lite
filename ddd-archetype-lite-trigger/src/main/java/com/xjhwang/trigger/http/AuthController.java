@@ -4,12 +4,10 @@ import com.xjhwang.domain.security.model.entity.SignInSubjectEntity;
 import com.xjhwang.domain.security.model.entity.SignUpSubjectEntity;
 import com.xjhwang.domain.security.service.identify.ISignInService;
 import com.xjhwang.domain.security.service.identify.ISignUpService;
-import com.xjhwang.trigger.api.IAuthService;
 import com.xjhwang.trigger.dto.SignInRequestDto;
 import com.xjhwang.trigger.dto.SignUpRequestDto;
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
-import com.xjhwang.types.model.Response;
 import com.xjhwang.types.util.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +23,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RequestMapping("/v1/auth/")
 @RestController
-public class AuthController implements IAuthService {
+public class AuthController {
     
     @Resource
     private ISignInService signInService;
@@ -34,8 +32,7 @@ public class AuthController implements IAuthService {
     private ISignUpService signUpService;
     
     @PostMapping("sign-in")
-    @Override
-    public Response<String> signIn(@RequestBody SignInRequestDto requestDto) {
+    public String signIn(@RequestBody SignInRequestDto requestDto) {
         
         Assert.notBlank(requestDto.getPhone(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
         Assert.notBlank(requestDto.getPassword(), () -> new ApplicationException(ResponseCode.USERNAME_OR_PASSWORD_INVALID));
@@ -44,13 +41,11 @@ public class AuthController implements IAuthService {
             .phone(requestDto.getPhone())
             .password(requestDto.getPassword())
             .build();
-        String token = signInService.signIn(signInSubjectEntity);
-        return Response.success(token);
+        return signInService.signIn(signInSubjectEntity);
     }
     
     @PostMapping("sign-up")
-    @Override
-    public Response<?> signUp(@RequestBody SignUpRequestDto requestDto) {
+    public void signUp(@RequestBody SignUpRequestDto requestDto) {
         
         Assert.notBlank(requestDto.getUsername(), () -> new ApplicationException(ResponseCode.USERNAME_IS_BLANK));
         Assert.notBlank(requestDto.getPhone(), () -> new ApplicationException(ResponseCode.PHONE_IS_BLANK));
@@ -63,6 +58,5 @@ public class AuthController implements IAuthService {
             .email(requestDto.getEmail())
             .build();
         signUpService.signUp(signUpSubjectEntity);
-        return Response.success();
     }
 }

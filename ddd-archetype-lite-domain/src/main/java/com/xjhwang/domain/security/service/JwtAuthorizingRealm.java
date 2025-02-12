@@ -1,8 +1,6 @@
 package com.xjhwang.domain.security.service;
 
 import com.xjhwang.domain.security.model.entity.JwtAuthenticationToken;
-import com.xjhwang.domain.security.model.entity.UserEntity;
-import com.xjhwang.domain.security.repository.ISecurityRepository;
 import io.jsonwebtoken.Claims;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -21,12 +19,9 @@ public class JwtAuthorizingRealm extends AuthorizingRealm {
     
     private final JwtProvider jwtProvider;
     
-    private final ISecurityRepository securityRepository;
-    
-    public JwtAuthorizingRealm(JwtProvider jwtProvider, ISecurityRepository securityRepository) {
+    public JwtAuthorizingRealm(JwtProvider jwtProvider) {
         
         this.jwtProvider = jwtProvider;
-        this.securityRepository = securityRepository;
     }
     
     @Override
@@ -37,7 +32,7 @@ public class JwtAuthorizingRealm extends AuthorizingRealm {
     
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        // 暂时不处理授权
+        // 不处理权限，权限交由业务层处理
         return null;
     }
     
@@ -49,10 +44,6 @@ public class JwtAuthorizingRealm extends AuthorizingRealm {
         Claims claims = jwtProvider.decode(jwt);
         // 获取用户电话
         String subject = claims.getSubject();
-        UserEntity userEntity = securityRepository.getUserByPhone(subject);
-        if (userEntity == null) {
-            throw new AuthenticationException("无效令牌");
-        }
         return new SimpleAuthenticationInfo(subject, token.getCredentials(), getName());
     }
 }

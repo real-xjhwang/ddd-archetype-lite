@@ -1,10 +1,12 @@
-package com.xjhwang.exception;
+package com.xjhwang.config;
 
 import com.xjhwang.types.enums.ResponseCode;
 import com.xjhwang.types.exception.ApplicationException;
 import com.xjhwang.types.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
+import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +19,32 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(UnauthenticatedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public Response<Void> handleUnauthenticatedException(UnauthenticatedException e) {
+        
+        log.error(e.getMessage(), e);
+        
+        return Response.<Void>builder()
+            .code(ResponseCode.UNAUTHENTICATED.getCode())
+            .info(ResponseCode.UNAUTHENTICATED.getInfo())
+            .build();
+    }
+    
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseBody
+    public Response<Void> handleUnauthorizedException(UnauthorizedException e) {
+        
+        log.error(e.getMessage(), e);
+        
+        return Response.<Void>builder()
+            .code(ResponseCode.UNAUTHORIZED.getCode())
+            .info(ResponseCode.UNAUTHORIZED.getInfo())
+            .build();
+    }
     
     @ExceptionHandler(ShiroException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)

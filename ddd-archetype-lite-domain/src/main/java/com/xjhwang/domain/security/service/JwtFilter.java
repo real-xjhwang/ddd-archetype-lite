@@ -1,13 +1,11 @@
 package com.xjhwang.domain.security.service;
 
-import com.alibaba.fastjson.JSON;
 import com.xjhwang.domain.security.model.entity.JwtAuthenticationToken;
-import com.xjhwang.types.enums.ResponseCode;
-import com.xjhwang.types.model.Response;
 import com.xjhwang.types.util.IdUtils;
 import com.xjhwang.types.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,8 +14,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * @author 黄雪杰 on 2024-07-11 18:12
@@ -55,24 +51,9 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     }
     
     @Override
-    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws IOException {
+    protected boolean onAccessDenied(ServletRequest request, ServletResponse response) {
         
-        HttpServletRequest httpServletRequest = (HttpServletRequest)request;
-        HttpServletResponse httpServletResponse = (HttpServletResponse)response;
-        httpServletResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-        httpServletResponse.setHeader("Access-Control-Allow-Origin", ((HttpServletRequest)request).getHeader("Origin"));
-        httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,PUT,DELETE");
-        httpServletResponse.setHeader("Access-Control-Allow-Headers", httpServletRequest.getHeader("Access-Control-Request-Headers"));
-        httpServletResponse.setContentType("application/json;charset=UTF-8");
-        httpServletResponse.setCharacterEncoding("UTF-8");
-        
-        PrintWriter writer = httpServletResponse.getWriter();
-        Response<?> r = Response.<String>builder()
-            .code(ResponseCode.UNAUTHORIZED.getCode())
-            .info(ResponseCode.UNAUTHORIZED.getInfo())
-            .build();
-        writer.write(JSON.toJSONString(r));
-        return false;
+        throw new UnauthenticatedException("认证失败");
     }
     
     @Override
